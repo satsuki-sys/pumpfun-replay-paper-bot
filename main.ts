@@ -12,7 +12,7 @@
 // byte for byte under vendor/. The bot is deterministic: no clock, no environment, no randomness;
 // iteration is over insertion-ordered maps fed by the batch stream. Every batch it answers with
 // at most hello.caps.max_orders_per_batch orders, and every order is decided on that batch's
-// slot and fills 2 slots later (the harness latency), so slippage on buys is capped at 2000 bps
+// slot and fills 2 slots later (the harness latency), so slippage on buys is capped at 800 bps
 // and sells go out wide open.
 
 import { runBot, type Batch, type BotState, type OrderInput, type Pubkey } from './vendor/makefun-bot.ts';
@@ -27,64 +27,64 @@ const P = {
   /** Entry lookback, in slots. */
   window: 48,
   /** Net SOL in over the window to enter. */
-  minNetSol: 0.8,
+  minNetSol: 2.0,
   /** Buy trades in the window. */
-  minBuys: 5,
+  minBuys: 6,
   /** Distinct buying wallets in the window. */
-  minBuyers: 4,
+  minBuyers: 6,
   /** Price rise over the window, lower and upper bound. */
-  minUp: 0.06,
+  minUp: 0.1,
   maxUp: 1.5,
   /** Newer-half net inflow must be at least this multiple of the older half's. */
-  accel: 1.0,
+  accel: 1.5,
   /** Price now must be at least this share of the window high. */
-  nearHigh: 0.92,
+  nearHigh: 0.97,
   /** Largest single buyer may fund at most this share of the window's buy SOL. */
-  maxBuyerShare: 0.6,
+  maxBuyerShare: 0.5,
   /** Real SOL reserve bounds at entry. */
   minRqSol: 1,
-  maxRqSol: 100,
+  maxRqSol: 60,
   /** Slots after the CreateEvent before an entry is allowed. */
-  minAge: 300,
+  minAge: 600,
   /** Total SOL a position may hold at cost. */
-  stakeSol: 1.2,
+  stakeSol: 0.6,
   /** First buy of a position, SOL. */
-  firstSol: 0.05,
+  firstSol: 0.03,
   /** Each pyramid add, SOL. */
-  addSol: 0.2,
+  addSol: 0.1,
   /** A pyramid add needs the price at least this far above the last buy's price. */
-  addStep: 0.02,
+  addStep: 0.05,
   /** A pyramid add needs the position up at least this much. */
-  addIfUp: 0.0,
+  addIfUp: 0.05,
   /** Slippage allowed on buys, bps. */
-  buySlipBps: 2000,
+  buySlipBps: 800,
   /** Stop loss vs cost. */
-  stopLoss: 0.2,
+  stopLoss: 0.12,
   /** Trailing stop from the position's best close value. */
-  trail: 0.2,
+  trail: 0.12,
   /** The trailing stop arms once the position is up this much. */
-  trailArm: 0.1,
+  trailArm: 0.05,
   /** Fade window, slots, and the net outflow over it that exits. */
   fadeWindow: 24,
-  fadeNetSol: -0.5,
+  fadeNetSol: -0.3,
   /** One recorded sell of at least this many SOL exits. */
-  bigSellSol: 3,
+  bigSellSol: 2,
   /** Max slots held (unless up a lot). */
-  maxHold: 1000,
+  maxHold: 500,
   /** Holding past maxHold is fine while up at least this much. */
   holdIfUp: 0.25,
   /** Slots to wait after an exit before the same curve may be bought again. */
-  cooldown: 200,
+  cooldown: 400,
   /** Most entries per curve over the run. */
-  maxEntries: 2,
+  maxEntries: 1,
   /** Most momentum positions open at once (the rest of the 5 slots is for probes). */
   maxMain: 4,
   /** Guardrail pacing: aim for this many coins / fills over paceSecs of block time. */
-  targetCoins: 30,
-  targetFills: 300,
+  targetCoins: 25,
+  targetFills: 240,
   paceSecs: 21_600,
   /** One probe round trip costs this much SOL. */
-  probeSol: 0.02,
+  probeSol: 0.01,
   /** Most probe positions open at once. */
   maxProbes: 1,
   /** Most SOL at cost across all positions at once. */
