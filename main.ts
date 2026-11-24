@@ -3,10 +3,12 @@
 // Idea: most pump.fun curves die fast, but a few run hard in their first hours. The bot watches
 // every curve's tape of recorded trades and buys only when several independent buyers are pushing
 // SOL in, the price is rising and still accelerating, and the curve is old enough that the launch
-// dump is behind it. It starts small, pyramids into strength, and exits on a stop loss, a
-// trailing stop, fading flow, a whale sell, or a hold-time limit. A pacing probe keeps the run
-// above the guardrails (at least 20 distinct mints with a round trip of at least 0.01 SOL each)
-// when the momentum entries alone fall behind pace.
+// dump is behind it. It starts small (0.05 SOL), pyramids into strength up to 1.2 SOL per coin,
+// and exits whole on the first of: a 12% stop loss against cost, a wide trailing stop that only
+// catches a near-total collapse, fading flow, a whale sell, or a 250-slot hold limit — the edge
+// is the first minutes of a run, so profits are taken by the clock, not by a tight trail. A pacing
+// probe keeps the run above the guardrails (at least 20 distinct mints with a round trip of at
+// least 0.01 SOL each) when momentum entries alone fall behind pace.
 //
 // The grader runs `node /bot/main.ts`; the SDK shim is the kit's sdk/ts/makefun-bot.ts, vendored
 // byte for byte under vendor/. The bot is deterministic: no clock, no environment, no randomness;
@@ -33,12 +35,12 @@ const P = {
   /** Distinct buying wallets in the window. */
   minBuyers: 6,
   /** Price rise over the window, lower and upper bound. */
-  minUp: 0.1,
+  minUp: 0.05,
   maxUp: 1.5,
   /** Newer-half net inflow must be at least this multiple of the older half's. */
   accel: 1.5,
   /** Price now must be at least this share of the window high. */
-  nearHigh: 0.97,
+  nearHigh: 0.9,
   /** Largest single buyer may fund at most this share of the window's buy SOL. */
   maxBuyerShare: 0.5,
   /** Real SOL reserve bounds at entry. */
@@ -47,21 +49,22 @@ const P = {
   /** Slots after the CreateEvent before an entry is allowed. */
   minAge: 600,
   /** Total SOL a position may hold at cost. */
-  stakeSol: 0.6,
+  stakeSol: 1.2,
   /** First buy of a position, SOL. */
-  firstSol: 0.03,
+  firstSol: 0.05,
   /** Each pyramid add, SOL. */
-  addSol: 0.1,
+  addSol: 0.2,
   /** A pyramid add needs the price at least this far above the last buy's price. */
   addStep: 0.05,
   /** A pyramid add needs the position up at least this much. */
-  addIfUp: 0.05,
+  addIfUp: 0.0,
   /** Slippage allowed on buys, bps. */
   buySlipBps: 800,
   /** Stop loss vs cost. */
   stopLoss: 0.12,
-  /** Trailing stop from the position's best close value. */
-  trail: 0.12,
+  /** Trailing stop from the position's best close value. Wide on purpose: within the
+      short hold window the winners need room to run; the hold limit takes profits. */
+  trail: 0.8,
   /** The trailing stop arms once the position is up this much. */
   trailArm: 0.05,
   /** Fade window, slots, and the net outflow over it that exits. */
@@ -69,8 +72,9 @@ const P = {
   fadeNetSol: -0.3,
   /** One recorded sell of at least this many SOL exits. */
   bigSellSol: 2,
-  /** Max slots held (unless up a lot). */
-  maxHold: 500,
+  /** Max slots held (unless up a lot). Short on purpose: the edge is the first minutes
+      of a run; holding longer just rides the dump. */
+  maxHold: 250,
   /** Holding past maxHold is fine while up at least this much. */
   holdIfUp: 0.25,
   /** Slots to wait after an exit before the same curve may be bought again. */
