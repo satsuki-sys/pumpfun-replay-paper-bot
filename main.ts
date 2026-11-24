@@ -49,11 +49,11 @@ const P = {
   /** Slots after the CreateEvent before an entry is allowed. */
   minAge: 600,
   /** Total SOL a position may hold at cost. */
-  stakeSol: 1.2,
+  stakeSol: 0.6,
   /** First buy of a position, SOL. */
-  firstSol: 0.05,
+  firstSol: 0.03,
   /** Each pyramid add, SOL. */
-  addSol: 0.2,
+  addSol: 0.1,
   /** A pyramid add needs the price at least this far above the last buy's price. */
   addStep: 0.05,
   /** A pyramid add needs the position up at least this much. */
