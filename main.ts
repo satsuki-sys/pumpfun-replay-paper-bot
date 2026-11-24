@@ -49,11 +49,11 @@ const P = {
   /** Slots after the CreateEvent before an entry is allowed. */
   minAge: 600,
   /** Total SOL a position may hold at cost. */
-  stakeSol: 0.6,
+  stakeSol: 2.0,
   /** First buy of a position, SOL. */
-  firstSol: 0.03,
+  firstSol: 0.1,
   /** Each pyramid add, SOL. */
-  addSol: 0.1,
+  addSol: 0.3,
   /** A pyramid add needs the price at least this far above the last buy's price. */
   addStep: 0.05,
   /** A pyramid add needs the position up at least this much. */
@@ -92,7 +92,7 @@ const P = {
   /** Most probe positions open at once. */
   maxProbes: 1,
   /** Most SOL at cost across all positions at once. */
-  maxExposureSol: 6,
+  maxExposureSol: 8,
 };
 
 // ---- per-curve tape -------------------------------------------------------
